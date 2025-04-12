@@ -138,6 +138,11 @@ add_action( 'widgets_init', 'hall_metal_art_widgets_init' );
  * Enqueue scripts and styles.
  */
 function hall_metal_art_scripts() {
+	// this code is so that the theme can be updated without having to change the version number in the stylesheet.
+	$stylesheet_uri = get_stylesheet_uri();
+	$stylesheet_path = get_template_directory() . '/style.css';
+	$stylesheet_version = filemtime($stylesheet_path);
+
 	wp_enqueue_style( 'hall-metal-art-style', get_stylesheet_uri(), array(), _S_VERSION );
 	wp_style_add_data( 'hall-metal-art-style', 'rtl', 'replace' );
 
@@ -175,4 +180,73 @@ require get_template_directory() . '/inc/customizer.php';
 if ( defined( 'JETPACK__VERSION' ) ) {
 	require get_template_directory() . '/inc/jetpack.php';
 }
+
+/*This function registers the custom post type*/ 
+
+function register_product_post_type() {
+    $labels = [
+        'name'                  => __('Products'),
+        'singular_name'         => __('Product'),
+        'menu_name'             => __('Products'),
+        'name_admin_bar'        => __('Product'),
+        'add_new'               => __('Add New'),
+        'add_new_item'          => __('Add New Product'),
+        'new_item'              => __('New Product'),
+        'edit_item'             => __('Edit Product'),
+        'view_item'             => __('View Product'),
+        'all_items'             => __('All Products'),
+        'search_items'          => __('Search Products'),
+        'not_found'             => __('No products found.'),
+        'not_found_in_trash'    => __('No products found in Trash.'),
+    ];
+
+    $args = [
+        'labels'             => $labels,
+        'public'             => true,
+        'publicly_queryable' => true,
+        'show_in_menu'       => true,
+        'menu_icon'          => 'dashicons-cart',
+        'query_var'          => true,
+        'rewrite'            => ['slug' => 'catalog'],
+        'capability_type'    => 'post',
+        'has_archive'        => true,
+        'hierarchical'       => false,
+        'menu_position'      => 5,
+        'supports'           => ['title', 'editor', 'thumbnail', 'excerpt'],
+        'show_in_rest'       => true // enables Gutenberg and REST API support
+    ];
+
+    register_post_type('product', $args);
+}
+add_action('init', 'register_product_post_type');
+
+/* This registers the product categories taxonomy */
+function register_product_taxonomies() {
+    $labels = [
+        'name'              => __('Product Categories'),
+        'singular_name'     => __('Product Category'),
+        'search_items'      => __('Search Categories'),
+        'all_items'         => __('All Categories'),
+        'parent_item'       => __('Parent Category'),
+        'parent_item_colon' => __('Parent Category:'),
+        'edit_item'         => __('Edit Category'),
+        'update_item'       => __('Update Category'),
+        'add_new_item'      => __('Add New Category'),
+        'new_item_name'     => __('New Category Name'),
+        'menu_name'         => __('Product Categories'),
+    ];
+
+    $args = [
+        'hierarchical'      => true, // like categories (set false for tags)
+        'labels'            => $labels,
+        'show_ui'           => true,
+        'show_admin_column' => true,
+        'query_var'         => true,
+        'rewrite'           => ['slug' => 'product-category'],
+        'show_in_rest'      => true,
+    ];
+
+    register_taxonomy('product_category', ['product'], $args);
+}
+add_action('init', 'register_product_taxonomies');
 
