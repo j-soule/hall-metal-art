@@ -250,3 +250,72 @@ function register_product_taxonomies() {
 }
 add_action('init', 'register_product_taxonomies');
 
+function add_custom_query_vars($vars) {
+	$vars[] = 'product_category';
+	return $vars;
+}
+add_filter('query_vars', 'add_custom_query_vars');
+
+function add_product_meta_boxes() {
+	add_meta_box(
+		'product_details_meta_box',
+		__('Product Details', 'hall-metal-art'),
+		'product_details_meta_box_callback',
+		'product',
+		'normal',
+		'high'
+	);
+}
+add_action('add_meta_boxes', 'add_product_meta_boxes');
+
+function product_details_meta_box_callback($post) {
+	wp_nonce_field('save_product_details', 'product_details_nonce');
+
+	$price = get_post_meta($post->ID, '_product_price', true);
+	$name = get_post_meta($post->ID, '_product_name', true);
+	$description = get_post_meta($post->ID, '_product_description', true);
+	?>
+
+	<p>
+		<label for="product_price"><?php _e('Price', 'hall-metal-art'); ?></label><br>
+		<input type="text" id="product_price" name="product_price" value="<?php echo esc_attr($price); ?>" style="width:50%;" />
+	</p>
+
+	<p>
+		<label for="product_name"><?php _e('Name', 'hall-metal-art'); ?></label><br>
+		<input type="text" id="product_name" name="product_name" value="<?php echo esc_attr($name); ?>" style="width:50%;" />
+	</p>
+
+	<p>
+		<label for="description"><?php _e('Description', 'hall-metal-art'); ?></label><br>
+		<input type="text" id="description" name="description" value="<?php echo esc_attr($description); ?>" style="width:50%;" />
+	</p>
+
+	<?php
+}
+function save_product_details($post_id) {
+	if (!isset($_POST['product_details_nonce']) || !wp_verify_nonce($_POST['product_details_nonce'], 'save_product_details')) {
+		return;
+	}
+
+	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+		return;
+	}
+
+	if (!current_user_can('edit_post', $post_id)) {
+		return;
+	}
+
+	if (isset($_POST['product_price'])) {
+		update_post_meta($post_id, '_product_price', sanitize_text_field($_POST['product_price']));
+	}
+
+	if (isset($_POST['product_price'])) {
+		update_post_meta($post_id, '_product_price', sanitize_text_field($_POST['product_price']));
+	}
+
+	if (isset($_POST['description'])) {
+		update_post_meta($post_id, '_description', sanitize_text_field($_POST['description']));
+	}
+}
+add_action('save_post', 'save_product_details');

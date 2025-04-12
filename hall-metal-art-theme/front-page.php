@@ -27,54 +27,12 @@ get_header();
     <!-- Custom Orders -->
     <section>
         <h2>Custom Orders</h2>
-        <div class="featured-products">
-            <?php
-            // Query for featured products
-            $args = array(
-                'post_type' => 'product',
-                'posts_per_page' => 4,
-                'meta_query' => array(
-                    array(
-                        'key' => '_featured',
-                        'value' => 'yes'
-                    )
-                )
-            );
-            $featured_products = new WP_Query($args);
-            if ($featured_products->have_posts()) {
-                while ($featured_products->have_posts()) {
-                    $featured_products->the_post();
-                    wc_get_template_part('content', 'product');
-                }
-            } else {
-                echo '<p>No featured products found.</p>';
-            }
-            wp_reset_postdata();
-            ?>
-        </div>
+        <p>We love to help our customers create custom pieces that fit their needs. If you have an idea for a custom piece, please reach out to us and we will work with you to make it a reality.</p>
     </section>
     <!-- Catalogue -->
     <section>
         <h2>Catalogue</h2>
-        <div class="catalogue-products">
-            <?php
-            // Query for all products
-            $args = array(
-                'post_type' => 'product',
-                'posts_per_page' => 12,
-            );
-            $all_products = new WP_Query($args);
-            if ($all_products->have_posts()) {
-                while ($all_products->have_posts()) {
-                    $all_products->the_post();
-                    wc_get_template_part('content', 'product');
-                }
-            } else {
-                echo '<p>No products found.</p>';
-            }
-            wp_reset_postdata();
-            ?>
-        </div>
+        <p>Check out our catalogue and see what we can do.</p>
     </section>
 
 </main>
